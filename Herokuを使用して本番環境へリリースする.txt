@@ -1,0 +1,105 @@
+全体の流れ
+1. 事前準備
+2. Herokuにログイン
+3. Herokuアプリを作成
+4. DBを追加・設定
+5. Dockerfileを本番環境用に修正
+6. Dockerイメージをビルド・リリース
+7. 機能追加
+
+(事前準備)
+1. GitHubへ登録
+    ターミナルで以下を設定
+    > git config --global user.name "ユーザー名"
+    > git config --global user.email "メールアドレス"
+    > git config --global merge.ff false
+    > git config --global pull.rebase merges
+    設定を確認
+    > git config --list
+2. Herokuに登録
+    *クレジットカードの登録が必要
+3. Heroku CLI のダウンロードとインストール
+    ターミナルで以下を実行
+    > brew tap heroku/brew && brew install heroku
+
+(Herokuにログイン)
+4. Herokuのログイン設定
+    ターミナルで以下を実行
+    > heroku login
+    * 実行後にブラウザでログインを実行
+5. Herokuコンテナレジストリにログイン設定
+    Dockerコンテナを登録できるようにする
+    > heroku container:login
+
+（Herokuアプリを作成）
+6. 「~/Develop/rails_docker」で以下を実行
+    > heroku create rails-docker-ckdec26
+    * アプリ名は、世界で一意とする必要があるので注意
+
+（DBを追加・設定)
+7. MySQLのアドオン追加（ここでは無料のIgniteを利用する。（ver5系)）
+    > 
+8. Databaseの設定を行う。
+    接続先情報等を環境変数とする。（セキュリティを考慮）
+    ~/Develop/rails-docker/config/database.ymlを編集
+    ⇒「production:」以下の設定を環境変数化
+9. Databaseの接続先情報をherokuで確認する。
+    > heroku config -a rails-docker-ckdec26
+    CLEARDB_DATABASE_URL: mysql://bef1263887b8e7:f8062efb@us-cdbr-east-05.cleardb.net/heroku_768de72f63fdc86?reconnect=true
+    CLEARDB_DATABASE_URL: mysql://ユーザー名:パスワード@ホスト名/データベース名?reconnect=true
+10. 上記で表示された内容を基にherokuの環境変数に設定
+    > heroku config:add APP_DATABASE='heroku_768de72f63fdc86' -a rails-docker-ckdec26
+    > heroku config:add APP_DATABASE_USERNAME='bef1263887b8e7' -a rails-docker-ckdec26
+    > heroku config:add APP_DATABASE_PASSWORD='f8062efb' -a rails-docker-ckdec26
+    > heroku config:add APP_DATABASE_HOST='us-cdbr-east-05.cleardb.net' -a rails-docker-ckdec26
+11. 上記の設定内容を確認する。
+    > heroku config -a rails-docker-ckdec26
+
+（Dockerfileを本番環境用に修正）
+12. 「~/Develop/rails_docker」の直下に「start.sh」を追加
+13. Dokerfileに以下を追記
+    * FROMの直後に追記
+    ENV RAILS_ENV=production
+
+    * 最終行に以下を追記（条件分岐を実行したいので「start.sh」内で処理する）
+    COPY start.sh /start.sh
+    RUN chmod 744 /start.sh
+    CMD ["sh", "/start.sh"]
+14. 「start.sh」へ追記
+15. 以下の環境変数を追加
+    > heroku config:add RAILS_SERVE_STATIC_FILES='true' -a rails-docker-ckdec26 
+16. 以下のURLを開く
+    https://tools.heroku.support/limits/boot_timeout
+    ※ Herokuは無料だとマシンパワーが低いのでタイムアウトを伸ばしておく（120秒に変更）
+17. ローカルのWebサーバーを削除しておく（Heroku上のWebサーバーと衝突する可能性がある？）
+    > docker-compose down
+    * 念の為、以下も実行する
+    > rm src/tmp/pids/server.pid
+
+(Dockerイメージをビルド・リリース)
+18. ビルドを実行する
+    > heroku container:push web -a rails-docker-ckdec26
+19. リリースを実行する
+    > heroku container:release web -a rails-docker-ckdec26
+20. Databaseのマイグレーションを実行する。（railsの場合）※今回は不要
+    > heroku run bundle exec rake db:migrate RAILS_ENV=production -a rails-docker-ckdec26
+21. アプリを起動する
+    > heroku open -a rails-docker-ckdec26
+
+(機能追加)
+22. ローカルでサーバーを起動
+    > docker-compose up -d  
+23. コントローラーを作成する
+    > docker-compose exec web bundle exec rails g controller users
+24. ルーティングを設定する
+    ~/Develop/rails_docker/src/config/routes.rbを開く
+25. コントローラーを設定する
+    ~/Develop/rails_docker/src/app/controller/users_controller.rbを開く
+26. HTMLファイルを作成する
+    ~/Develop/rails_docker/src/app/views/users/index.html.erbを作成
+27. ビルド、リリース、オープンを実行する
+    > heroku container:push web -a rails-docker-ckdec26
+    > heroku container:release web -a rails-docker-ckdec26
+    > heroku opne -a rails-docker-ckdec26
+    
+

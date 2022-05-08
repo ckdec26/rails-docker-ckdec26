@@ -1,0 +1,38 @@
+基本操作
+1. イメージのビルド
+    docker-compose build
+2. コンテナの作成と起動
+    docker-compose up -d
+3. コンテナを停止・削除
+    docker-compose down
+
+その他よく使う操作
+・コンテナの一覧を表示
+    docker-compose ps
+・ログを表示
+    docker-compose logs
+・コンテナを作成してコマンド実行
+    docker-compose run <サービス> <コマンド>
+・起動中のコンテナにコマンド実行
+    docker-compose exec <サービス> <コマンド>
+
+全体の流れ（railsによる実践的なサービスを構築）
+1. Dockerfile等、各種ファイルを作成
+    ディレクトリ「rails_docker」とその直下に以下のファイルを作成する
+    ・Dockerfile
+    ・docker-compose.yml
+    ディレクトリ「src」とその直下に以下のファイルを作成する
+    ・Gemfile
+2. ディレクトリ「rails_docker」で以下のコマンドを実行
+    > docker-compose run web rails new . --force --database=mysql
+    * railsの雛形が作成される。
+    * サービス「web」に対するコマンドの為、「web」を記述している
+3. railsの雛形が作成されたので、改めてビルドする
+    > docker-compose build
+4. Databaseの設定を行う。
+    database.ymlを編集
+    ・passwordとhostを「docker-compose.yml」に記載した内容に変更
+5. Databaseを作成する
+    > docker-compose run web rails db:create
+6. Dockerを起動する
+    
