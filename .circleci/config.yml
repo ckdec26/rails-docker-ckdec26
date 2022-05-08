@@ -50,7 +50,7 @@ jobs:
 # CDにより追加
   deploy:
     docker:
-      - image: cimg/ruby:2.7.5
+      - image: cimg/ruby:2.7.6
     steps:
       - checkout
       - setup_remote_docker:
