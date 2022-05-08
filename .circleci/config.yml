@@ -46,7 +46,7 @@ jobs:
           name: test
           command: bundle exec rake test
 
-##################################3
+##################################s
 # CDにより追加
   deploy:
     docker:
@@ -69,11 +69,11 @@ jobs:
           name: database setup
           command: heroku run bundle exec rake db:migrate
           RAILS_ENV=production -a $HEROKU_APP_NAME
-##################################3
+##################################
 
 workflows:
   version: 2
-#########################3
+#########################
 # CD向けに編集
 #  build_and_test:
 #    jobs:
@@ -93,5 +93,5 @@ workflows:
             - test
           filters:
             branches:
-              only:main
-
+              only: main
+#########################
