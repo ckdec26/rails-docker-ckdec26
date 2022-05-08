@@ -36,7 +36,7 @@ Gitコマンド
     > git commit -m "メッセージ"
 ・GitHubにプッシュ
     > git push origin <ブランチ名>
-・ブランチを作成して切り替える
+・ブランチを作成して切り替えるs
     > git switch <ブランチ名>
 ・GitHubの変更内容を取り込む
     > git pull origin <ブランチ名>
@@ -54,6 +54,21 @@ Gitコマンド
     ・.gitignoreを追加
         管理外のファイルを記述しておく
     ・コミット、プッシュ
+
+2. CI
+    ・テストコードを記載
+        1. ~/Develop/rails_docker/src/test/controllers/users_controller_test.rbを変更
+            * 「assert」を「false」にする事でわざとエラーとする。
+        2. 以下を実行して、エラーとなるのを確認
+            > docker-compose up -d
+            > docker-compose exec web bundle exec rake test
+    ・CircleCIに登録
+        1. 
+    ・プロジェクトを登録
+    ・configを設定
+    ・環境変数を設定
+    ・GitHubにプッシュ
+    ・テストを修正
 
 
 
