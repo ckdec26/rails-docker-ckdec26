@@ -5,16 +5,16 @@ orbs:
 jobs:
   build:
     docker:
-      - image: circleci/ruby:2.7
+      - image: cimg/ruby:2.7.5
     working_directory: ~/rails-docker-ckdec26/src
     steps:
       - checkout:
           path: ~/rails-docker-ckdec26
       - ruby/install-deps
-  
+      
   test:
     docker:
-      - image: circleci/ruby:2.7
+      - image: cimg/ruby:2.7.5
       - image: circleci/mysql:5.5
         environment:
           MYSQL_ROOT_PASSWORD: password
